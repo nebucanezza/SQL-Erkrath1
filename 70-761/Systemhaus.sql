@@ -43,11 +43,20 @@ CREATE TABLE Kategorie (
 );
 GO
 --Hilfstabellen
-CREATE TABLE ProjektMitarbeiter(	MitarbeiterID INT NOT NULL,	ProjektID INT NOT NULL);
+CREATE TABLE ProjektMitarbeiter(
+	MitarbeiterID INT NOT NULL,
+	ProjektID INT NOT NULL
+);
 
-CREATE TABLE AuftragArtikel(	AuftragNr INT NOT NULL,	ArtikelNr INT NOT NULL,);
+CREATE TABLE AuftragArtikel(
+	AuftragNr INT NOT NULL,
+	ArtikelNr INT NOT NULL,
+);
 
-CREATE TABLE Artikelkategorie(	ArtikelNr INT NOT NULL,	Kategorienamen CHAR(50) NOT NULL);
+CREATE TABLE Artikelkategorie(
+	ArtikelNr INT NOT NULL,
+	Kategorienamen CHAR(50) NOT NULL
+);
 
 --Anlegen von Beziehungen
 --Fremschlüssel von AuftragArtikel zu Auftrag
@@ -65,12 +74,16 @@ ALTER TABLE Artikel ALTER COLUMN Bezeichung CHAR(50) NOT NULL;
 ALTER TABLE AuftragArtikel ALTER COLUMN AuftragNr INT NULL;
 ALTER TABLE AuftragArtikel ADD Preis MONEY;
 ALTER TABLE AuftragArtikel ADD Menge INT DEFAULT 15;
+ALTER TABLE AuftragArtikel ALTER COLUMN AuftragNr INT NOT NULL;
 
-ALTER TABLE AuftragArtikel ADD CONSTRAINT chk_min_time CHECK (Menge>=15);
+
+ALTER TABLE AuftragArtikel WITH NOCHECK ADD CONSTRAINT chk_min_time CHECK (Menge>=15);
 
 ALTER TABLE AuftragArtikel DROP CONSTRAINT chk_min_time;
 
 ALTER TABLE AuftragArtikel ADD PreisMenge AS (menge * (preis/60));
+
+ALTER TABLE AuftragArtikel ADD CONSTRAINT PK_AufrtragNrArtikelNr PRIMARY KEY (AuftragNr, ArtikelNr);
 
 
 --Anlegen eines Datensatzes
@@ -78,8 +91,15 @@ ALTER TABLE AuftragArtikel ADD PreisMenge AS (menge * (preis/60));
 --INSERT INTO Abteilung (AbteilungsName) VALUES ('Entwicklung');
 --INSERT INTO Abteilung (AbteilungsName ) VALUES ('Buchhaltung');
 
-INSERT INTO Auftrag(KundenNr, MitarbeiterID) VALUES (1,1);
-INSERT INTO Artikel (Bezeichung) VALUES ('Arbeitsstunde Pascal Entwicklung');
+DECLARE @z INT = 0;
+WHILE @z < 50000
+BEGIN 
+	INSERT INTO Auftrag(KundenNr, MitarbeiterID) VALUES (@z,@z);
+	SET @z +=1;
+END
+
+
+INSERT INTO Artikel (Bezeichung) VALUES ('Arbeitsstunde C# Entwicklung');
 
 INSERT INTO AuftragArtikel ( AuftragNr, ArtikelNr) VALUES (1000,1001);
 
@@ -88,7 +108,12 @@ INSERT INTO AuftragArtikel ( AuftragNr, ArtikelNr) VALUES (1000,1002);
 INSERT INTO AuftragArtikel ( AuftragNr, ArtikelNr) VALUES (NULL,1002);
 
 INSERT INTO AuftragArtikel (AuftragNr, ArtikelNr, Preis) VALUES (1000, 1002, 119.99 );
-INSERT INTO AuftragArtikel (AuftragNr, ArtikelNr, Preis, Menge) VALUES (1000, 1002, 119.99, 0 );
+
+
+
+INSERT INTO AuftragArtikel (AuftragNr, ArtikelNr, Preis, Menge) VALUES (1000, 1001, 119.99,360);
+INSERT INTO AuftragArtikel (AuftragNr, ArtikelNr, Preis, Menge) VALUES (1000, 1001, 119.99,360);
+INSERT INTO AuftragArtikel (AuftragNr, ArtikelNr, Preis, Menge) VALUES (1001, 1001, 60, 360);
 
 
 SELECT * FROM AuftragArtikel;
@@ -108,6 +133,6 @@ SELECT * FROM AuftragArtikel;
 --SELECT * FROM Artikel;
 
 --TRUNCATE TABLE Abteilung;
-
+TRUNCATE TABLE AuftragArtikel;
 SELECT * FROM Auftrag;
 SELECT * FROM Artikel;
